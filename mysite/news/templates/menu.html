@@ -1,0 +1,30 @@
+<div class="header-container">
+    <header>
+        <div class="title-container">
+            <h1><a href="{% url 'home' %}" class="home-link">World News</a></h1>
+        </div>
+        <nav>
+            <ul>
+                <li class="{% if country.name == 'USA' %}active{% endif %}"><a href="{% url 'country_news' country_name='USA' %}">USA</a></li>
+                <li class="{% if country.name == 'Russia' %}active{% endif %}"><a href="{% url 'country_news' country_name='Russia' %}">Russia</a></li>
+                <li class="{% if country.name == 'China' %}active{% endif %}"><a href="{% url 'country_news' country_name='China' %}">China</a></li>
+                <li class="{% if country.name == 'Japan' %}active{% endif %}"><a href="{% url 'country_news' country_name='Japan' %}">Japan</a></li>
+                <li class="{% if country.name == 'Germany' %}active{% endif %}"><a href="{% url 'country_news' country_name='Germany' %}">Germany</a></li>
+                <li class="{% if country.name == 'France' %}active{% endif %}"><a href="{% url 'country_news' country_name='France' %}">France</a></li>
+                <li class="{% if country.name == 'Italy' %}active{% endif %}"><a href="{% url 'country_news' country_name='Italy' %}">Italy</a></li>
+                <li class="{% if country.name == 'Australia' %}active{% endif %}"><a href="{% url 'country_news' country_name='Australia' %}">Australia</a></li>
+                <li class="{% if country.name == 'Argentina' %}active{% endif %}"><a href="{% url 'country_news' country_name='Argentina' %}">Argentina</a></li>
+                <li class="{% if country.name == 'Sweden' %}active{% endif %}"><a href="{% url 'country_news' country_name='Sweden' %}">Sweden</a></li>
+                <li class="{% if country.name == 'Mexico' %}active{% endif %}"><a href="{% url 'country_news' country_name='Mexico' %}">Mexico</a></li>
+                <li class="{% if country.name == 'Netherlands' %}active{% endif %}"><a href="{% url 'country_news' country_name='Netherlands' %}">Netherlands</a></li>
+                <li class="{% if country.name == 'Norway' %}active{% endif %}"><a href="{% url 'country_news' country_name='Norway' %}">Norway</a></li>
+                <li class="{% if country.name == 'Poland' %}active{% endif %}"><a href="{% url 'country_news' country_name='Poland' %}">Poland</a></li>
+                <li class="{% if country.name == 'Spain' %}active{% endif %}"><a href="{% url 'country_news' country_name='Spain' %}">Spain</a></li>
+                <li class="{% if country.name == 'Switzerland' %}active{% endif %}"><a href="{% url 'country_news' country_name='Switzerland' %}">Switzerland</a></li>
+                <li class="{% if country.name == 'Türkiye' %}active{% endif %}"><a href="{% url 'country_news' country_name='Türkiye' %}">Türkiye</a></li>
+                <li class="{% if country.name == 'Vietnam' %}active{% endif %}"><a href="{% url 'country_news' country_name='Vietnam' %}">Vietnam</a></li>
+                <!-- Добавьте другие страны по аналогии -->
+            </ul>
+        </nav>
+    </header>
+</div>
