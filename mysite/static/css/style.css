@@ -1,92 +1,172 @@
 html, body {
-    margin: 0; /* Убираем отступы */
-    padding: 0; /* Убираем внутренние отступы */
-    width: 100%; /* Задаем ширину на всю доступную ширину */
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
-/* Стилизация контейнера шапки */
+
 .header-container {
-    background-color: black; /* Цвет фона */
-    padding: 0px; /* Ширина фона */
-    display: flex; /* Используем flexbox для выравнивания элементов внутри */
-    justify-content: space-between; /* Располагаем элементы с пространством между ними */
-    width: 100%; /* Ширина на всю доступную ширину */
+    background-color: black;
+    display: flex;
+    justify-content: flex-start; /* Выравниваем элементы слева */
+    align-items: center;
+    width: 100%;
+    padding: 10px 0;
+    padding-left: 20px; /* Добавляем небольшой внутренний отступ слева */
 }
 
-/* Стилизация заголовка в шапке */
+
+/* Стилизация контейнера меню */
+.menu-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap; /* Предотвращает перенос элементов на новую строку */
+}
+
+/* Стилизация первого пункта списка в навигации */
+nav ul li:first-child {
+    padding-left: 30px; /* Добавляем левый внутренний отступ для первого пункта */
+}
+
+/* Стилизация заголовка */
 .title-container h1 {
-    color: white; /* Цвет текста - белый */
-    text-decoration: none;
-    position: relative;
-    margin: 5px; /* Убираем внешние отступы > Влияет на ширину фона!!! */ 
-    margin-left: 30px /* Левый отступ */
-    
-}
-
-/* Стилизация последнего пункта в списке навигации */
-nav li:last-child {
-    margin-right: 100px; /* Правый отступ*/
+    color: white;
+    margin: 0; /* Убираем внешние отступы */
+    padding: 0;
 }
 
 /* Стилизация ссылки в заголовке */
 .home-link {
-    color: white; /* Цвет текста - белый */
-    text-decoration: none; /* Убираем подчеркивание у ссылки */
-}
-
-/* Стилизация основной части шапки */
-header {
-    display: flex; /* Используем flexbox для выравнивания элементов внутри */
-    align-items: center; /* Выравниваем элементы по центру по вертикали */
-    justify-content: space-between; /* Располагаем элементы с пространством между ними */
-    max-width: 100%; /* Максимальная ширина */
-    width: 95%; /* Ширина 95% от родительского элемента */
+    color: white;
+    text-decoration: none;
 }
 
 /* Стилизация навигационного меню */
 nav {
-    display: flex; /* Используем flexbox для выравнивания элементов внутри */
-    justify-content: center; /* Выравниваем элементы по центру */
-    flex-grow: 1; /* Элемент растягивается, занимая доступное пространство */
+    display: flex;
 }
 
 /* Стилизация списка в навигации */
 nav ul {
-    list-style: none; /* Убираем стандартные маркеры списка */
-    padding: 0; /* Убираем внутренние отступы */
-    margin: 0; /* Убираем внешние отступы */
-    display: flex; /* Используем flexbox для выравнивания элементов внутри */
-    justify-content: flex-end; /* Выравниваем элементы в конце */
-    flex-grow: 1;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center; /* Выравнивание элементов списка по центру */
 }
 
 /* Стилизация каждого пункта в списке навигации */
 nav li {
-    margin: 0 17px; /* Отступы между пунктами списка */
+    margin: 0 17px;
 }
 
 /* Стилизация ссылок в навигации */
 nav a {
-    color: white; /* Цвет текста - белый */
-    text-decoration: none; /* Убираем подчеркивание у ссылки */
+    color: white;
+    text-decoration: none;
 }
 
 /* Стилизация ссылок в навигации при наведении */
 nav a:hover {
-    color: grey; /* Цвет текста при наведении - серый */
+    color: grey;
 }
 
 .active a {
-    text-decoration: none; /* Убираем стандартное подчеркивание */
-    position: relative; /* Необходимо для позиционирования псевдоэлемента */
+    text-decoration: none;
+    position: relative;
 }
 
 .active a::after {
-    content: ''; /* Псевдоэлемент должен содержать пустое значение content */
+    content: '';
     position: absolute;
     left: 0;
-    bottom: -6px; /* Смещаем подчеркивание вниз */
-    width: 100%; /* Ширина подчеркивания соответствует ширине элемента a */
-    height: 1px; /* Толщина линии подчеркивания */
-    background-color: white; /* Цвет линии подчеркивания */
+    bottom: -6px;
+    width: 100%;
+    height: 1px;
+    background-color: white;
 }
+
+/* Стилизация выпадающего списка */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Стилизация кнопки выпадающего списка */
+.dropbtn {
+    color: white;
+    text-decoration: none;
+    padding: 10px;
+    display: inline-block;
+}
+
+.dropbtn::after {
+    content: '▼'; /* Символ стрелочки вниз */
+    font-size: 12px; /* Размер шрифта стрелочки */
+    margin-left: 5px; /* Отступ слева */
+}
+
+/* Стилизация контента выпадающего списка */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: #f9f9f9;
+    min-width: 140px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    overflow-y: auto; /* Добавляет вертикальный скролл */
+    max-height: 300px; /* Задает максимальную высоту списка */
+    border-radius: 5px;
+    /* Прочие стили */
+}
+
+
+/* Стилизация ссылок внутри выпадающего списка */
+.dropdown-content a {
+    color: black; /* Цвет текста */
+    padding: 12px 16px; /* Отступы */
+    text-decoration: none;
+    display: block;
+    text-align: left;
+}
+
+/* Изменение фона при наведении */
+.dropdown-content a:hover {background-color: #f1f1f1;}
+
+/* Отображение выпадающего списка при наведении */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Настройки стилизации выпадающего списка (вы можете изменять их) */
+.dropdown-content {
+    border-radius: 5px; /* Закругление углов */
+    /* Добавьте сюда дополнительные стили при необходимости */
+}
+
+/* Стилизация полосы прокрутки для всех элементов */
+::-webkit-scrollbar {
+    width: 5px; /* Ширина полосы прокрутки */
+}
+
+/* Стилизация дорожки (пути) полосы прокрутки */
+::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Цвет фона дорожки */
+    border-radius: 10px; /* Закругление углов */
+}
+
+/* Стилизация самого ползунка полосы прокрутки */
+::-webkit-scrollbar-thumb {
+    background: #888; /* Цвет ползунка */
+    border-radius: 10px; /* Закругление углов */
+}
+
+/* Стилизация ползунка при наведении */
+::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Цвет ползунка при наведении */
+}
+

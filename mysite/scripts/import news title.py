@@ -63,6 +63,7 @@ locations = {
     "VN": "Vietnam"
 }
 
+unique_articles = {}
 
 def create_driver():
     chrome_options = Options()
@@ -119,19 +120,17 @@ def fetch_articles(loc, driver, articles):
                 By.CSS_SELECTOR, "div.search-count-title")
                 search_count = parse_search_count(search_count_element.text)
 
-                # Создаем словарь для хранения названия статьи, описания и кода страны
-                article_info = {
-                    "title": full_title,
-                    "description": summary_part,
-                    "country_code": loc,
-                    "search_count": search_count  # Добавление количества поисковых запросов
-                }
+                key = (full_title, summary_part)
 
-                if article_info not in articles:
-                    articles.append(article_info)
-                    print(article_info)
-                else:
-                    print(f"Статья уже обработана: {article_info['title']}")
+                # Создаем словарь для хранения названия статьи, описания и кода страны
+                if key not in unique_articles or unique_articles[key]["search_count"] < search_count:
+                    article_info = {
+                        "title": full_title,
+                        "description": summary_part,
+                        "country_code": loc,
+                        "search_count": search_count
+                    }
+                    unique_articles[key] = article_info
 
             except Exception as e:
                 print(f"Произошла ошибка: {e}")
@@ -141,16 +140,20 @@ def fetch_articles(loc, driver, articles):
 def insert_into_db(article_title, article_description, location, search_count):
     conn = None
     try:
-        # Подключение к базе данных SQLite
         conn = sqlite3.connect(r'C:\Users\als19\Desktop\mysite\db.sqlite3')
         cursor = conn.cursor()
-        
-        # SQL-запрос для вставки данных
-        query = """INSERT INTO news (title, description, country_article, searches) VALUES (?, ?, ?, ?)"""
-        cursor.execute(query, (article_title, article_description, location, search_count))
 
-        # Фиксация транзакции и закрытие соединения
-        conn.commit()
+        # Проверяем, существует ли уже такая новость в базе данных
+        query_check = """SELECT COUNT(*) FROM news WHERE title = ? AND description = ?"""
+        cursor.execute(query_check, (article_title, article_description))
+        exists = cursor.fetchone()[0] > 0
+
+        # Если новость не существует, добавляем ее в базу данных
+        if not exists:
+            query_insert = """INSERT INTO news (title, description, country_article, searches) VALUES (?, ?, ?, ?)"""
+            cursor.execute(query_insert, (article_title, article_description, location, search_count))
+            conn.commit()
+
     except sqlite3.Error as e:
         print(f"Ошибка SQLite: {e}")
     finally:
@@ -158,18 +161,17 @@ def insert_into_db(article_title, article_description, location, search_count):
             conn.close()
 
 async def main():
-    articles = []  # Список для хранения статей из всех местоположений
     with ThreadPoolExecutor(max_workers=10) as executor:
         loop = asyncio.get_event_loop()
         tasks = []
         for loc in locations.keys():  # Используем только ключи из словаря locations
             driver = create_driver()
             task = loop.run_in_executor(
-                executor, fetch_articles, loc, driver, articles)
+                executor, fetch_articles, loc, driver, unique_articles)
             tasks.append(task)
         await asyncio.gather(*tasks)
 
-    for article in articles:
+    for key, article in unique_articles.items():
         title = article['title']
         description = article['description']
         country_code = article['country_code']

@@ -5,7 +5,7 @@ def create_table():
     cursor = conn.cursor()
 
     create_table_query = """
-    CREATE TABLE IF NOT EXISTS news (
+    CREATE TABLE IF NOT EXISTS news_ (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
         description TEXT,
