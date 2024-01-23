@@ -1,3 +1,10 @@
+@media (max-width: 600px) {
+    .news-container {
+        grid-template-columns: 1fr; /* Для мобильных устройств */
+    }
+}
+
+
 html, body {
     width: 100%;
     height: 100%;
@@ -170,3 +177,55 @@ nav a:hover {
     background: #555; /* Цвет ползунка при наведении */
 }
 
+
+.news-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    margin-top: 50px;
+}
+
+.news-item {
+    background-color: #f5f5f5;
+    padding: 15px;
+    border-radius: 10px; /* Закругленные углы для плиток */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Плавный переход для эффектов наведения */
+    cursor: pointer; /* Изменение курсора для указания на кликабельность */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Тень для эффекта плавающей плитки */
+}
+
+.news-item:hover {
+    transform: translateY(-5px); /* Поднимает плитку при наведении */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3); /* Увеличивает тень при наведении */
+}
+
+/* Убедитесь, что ваши ссылки внутри .news-item стилизованы соответствующим образом */
+.news-item a {
+    text-decoration: none;
+    color: inherit; /* Наследует цвет текста от родительского элемента */
+}
+
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+main {
+    margin-left: 250px; /* Отступ слева */
+    margin-right: 250px; /* Отступ справа */
+}
+
+.country-name-container {
+    text-align: center; /* Выравнивание по центру */
+    margin-top: 20px; /* Отступ сверху для отделения от меню */
+    margin-bottom: 20px; /* Отступ снизу перед основным контентом */
+}
+
+.country-name {
+    color: red; /* Красный цвет текста */
+    font-size: 82px; /* Увеличенный размер шрифта */
+    font-weight: bold; /* Жирное начертание */
+    /* Можно добавить дополнительные стили, например, для шрифта */
+}

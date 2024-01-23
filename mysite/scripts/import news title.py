@@ -9,6 +9,12 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import sqlite3
+import logging
+import datetime
+
+# Настройка логирования
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 locations = {
     "AR": "Argentina",
@@ -86,97 +92,78 @@ def parse_search_count(search_count_str):
         return int(search_count_str)
 
 
-def fetch_articles(loc, driver, articles):
+def fetch_articles(loc, driver):
+    articles = {}
     try:
         url = f"https://trends.google.com/trends/trendingsearches/daily?geo={loc}"
         driver.get(url)
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, "md-list.md-list-block"))
+        )
 
-        try:
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_all_elements_located(
-                    (By.CSS_SELECTOR, "md-list.md-list-block"))
-            )
-        except TimeoutException:
-            print(f"Тайм-аут при ожидании загрузки статей для {loc}")
-            return
+        articles_elements = driver.find_elements(By.CSS_SELECTOR, "md-list.md-list-block")
 
-        articles_elements = driver.find_elements(
-            By.CSS_SELECTOR, "md-list.md-list-block")
-        
         for article in articles_elements:
-            try:
-                WebDriverWait(driver, 10).until(
-                    EC.presence_of_all_elements_located(
-                        (By.CSS_SELECTOR, "div.details-wrapper div.details div.details-top div > span > a"))
-                )
-                title_parts = article.find_elements(
-                    By.CSS_SELECTOR, "div.details-wrapper div.details div.details-top div > span > a")
-                summary_part = article.find_element(
-                    By.CSS_SELECTOR, "div.subtitles-text-wrapper.visible div.summary-text > a").text
-
-                full_title = ' '.join([part.text for part in title_parts])
-
-                search_count_element = article.find_element(
-                By.CSS_SELECTOR, "div.search-count-title")
-                search_count = parse_search_count(search_count_element.text)
-
-                key = (full_title, summary_part)
-
-                # Создаем словарь для хранения названия статьи, описания и кода страны
-                if key not in unique_articles or unique_articles[key]["search_count"] < search_count:
-                    article_info = {
-                        "title": full_title,
-                        "description": summary_part,
-                        "country_code": loc,
-                        "search_count": search_count
-                    }
-                    unique_articles[key] = article_info
-
-            except Exception as e:
-                print(f"Произошла ошибка: {e}")
+            title_parts = article.find_elements(By.CSS_SELECTOR, "div.details-wrapper div.details div.details-top div > span > a")
+            summary_part = article.find_element(By.CSS_SELECTOR, "div.subtitles-text-wrapper.visible div.summary-text > a").text
+            full_title = ' '.join([part.text for part in title_parts])
+            search_count_element = article.find_element(By.CSS_SELECTOR, "div.search-count-title")
+            search_count = parse_search_count(search_count_element.text)
+            key = (full_title, summary_part)
+            if key not in articles or articles[key]["search_count"] < search_count:
+                articles[key] = {
+                    "title": full_title,
+                    "description": summary_part,
+                    "country_code": loc,
+                    "search_count": search_count
+                }
+    except TimeoutException:
+        logger.info(f"Тайм-аут при ожидании загрузки статей для {loc}")
+    except Exception as e:
+        logger.error(f"Ошибка при извлечении статей для {loc}: {e}")
     finally:
         driver.quit()
+    return articles
 
-def insert_into_db(article_title, article_description, location, search_count):
-    conn = None
+def insert_into_db(article_title, article_description, country_name, search_count):
     try:
-        conn = sqlite3.connect(r'C:\Users\als19\Desktop\mysite\db.sqlite3')
-        cursor = conn.cursor()
+        if country_name == "United States":
+            country_name = "USA"
 
-        # Проверяем, существует ли уже такая новость в базе данных
-        query_check = """SELECT COUNT(*) FROM news WHERE title = ? AND description = ?"""
-        cursor.execute(query_check, (article_title, article_description))
-        exists = cursor.fetchone()[0] > 0
-
-        # Если новость не существует, добавляем ее в базу данных
-        if not exists:
-            query_insert = """INSERT INTO news (title, description, country_article, searches) VALUES (?, ?, ?, ?)"""
-            cursor.execute(query_insert, (article_title, article_description, location, search_count))
-            conn.commit()
-
+        with sqlite3.connect(r'C:\Users\als19\Desktop\mysite\db.sqlite3') as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM news WHERE title = ? AND description = ?", (article_title, article_description))
+            exists = cursor.fetchone()[0] > 0
+            if not exists:
+                current_datetime = datetime.datetime.now()
+                formatted_date = current_datetime.strftime('%Y-%m-%d %H:%M:%S') # Преобразование datetime в строку
+                cursor.execute("INSERT INTO news (title, description, country_name, searches, date) VALUES (?, ?, ?, ?, ?)",
+                               (article_title, article_description, country_name, search_count, formatted_date))
     except sqlite3.Error as e:
-        print(f"Ошибка SQLite: {e}")
-    finally:
-        if conn:
-            conn.close()
+        logger.error(f"Ошибка SQLite: {e}")
 
 async def main():
     with ThreadPoolExecutor(max_workers=10) as executor:
         loop = asyncio.get_event_loop()
         tasks = []
-        for loc in locations.keys():  # Используем только ключи из словаря locations
+        for loc in locations.keys():
             driver = create_driver()
-            task = loop.run_in_executor(
-                executor, fetch_articles, loc, driver, unique_articles)
+            task = loop.run_in_executor(executor, fetch_articles, loc, driver)
             tasks.append(task)
-        await asyncio.gather(*tasks)
+        results = await asyncio.gather(*tasks)
 
-    for key, article in unique_articles.items():
-        title = article['title']
-        description = article['description']
-        country_code = article['country_code']
-        search_count = article['search_count']
-        insert_into_db(title, description, country_code, search_count)
+        for articles in results:
+            for key, article_info in articles.items():
+                if key not in unique_articles or unique_articles[key]["search_count"] < article_info["search_count"]:
+                    unique_articles[key] = article_info
+
+        for article_info in unique_articles.values():
+            title = article_info['title']
+            description = article_info['description']
+            country_code = article_info['country_code']
+            country_name = locations[country_code]
+            search_count = article_info['search_count']
+            insert_into_db(title, description, country_name, search_count)
 
 if __name__ == "__main__":
     asyncio.run(main())

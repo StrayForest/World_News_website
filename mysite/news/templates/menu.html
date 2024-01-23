@@ -12,7 +12,6 @@
                     <!-- Список стран -->
                     <li class="{% if country.name == 'USA' %}active{% endif %}"><a href="{% url 'country_news' country_name='USA' %}">USA</a></li>
                     <li class="{% if country.name == 'Russia' %}active{% endif %}"><a href="{% url 'country_news' country_name='Russia' %}">Russia</a></li>
-                    <li class="{% if country.name == 'China' %}active{% endif %}"><a href="{% url 'country_news' country_name='China' %}">China</a></li>
                     <li class="{% if country.name == 'Japan' %}active{% endif %}"><a href="{% url 'country_news' country_name='Japan' %}">Japan</a></li>
                     <li class="{% if country.name == 'Germany' %}active{% endif %}"><a href="{% url 'country_news' country_name='Germany' %}">Germany</a></li>
                     <li class="{% if country.name == 'France' %}active{% endif %}"><a href="{% url 'country_news' country_name='France' %}">France</a></li>
@@ -67,7 +66,6 @@
                             <!-- Добавьте здесь дополнительные страны или категории -->
                         </div>
                     </li>
-                    <!-- Добавьте другие страны по аналогии -->
                 </ul>
             </nav>
         </div>
