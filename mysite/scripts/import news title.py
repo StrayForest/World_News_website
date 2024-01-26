@@ -71,6 +71,7 @@ locations = {
 
 unique_articles = {}
 
+
 def create_driver():
     chrome_options = Options()
     chrome_options.add_argument("--headless")
@@ -95,25 +96,35 @@ def parse_search_count(search_count_str):
 def fetch_articles(loc, driver):
     articles = {}
     try:
-        url = f"https://trends.google.com/trends/trendingsearches/daily?geo={loc}"
+        url = f"https://trends.google.com/trends/trendingsearches/daily?geo={
+            loc}"
         driver.get(url)
         WebDriverWait(driver, 10).until(
-            EC.presence_of_all_elements_located((By.CSS_SELECTOR, "md-list.md-list-block"))
+            EC.presence_of_all_elements_located(
+                (By.CSS_SELECTOR, "md-list.md-list-block"))
         )
 
-        articles_elements = driver.find_elements(By.CSS_SELECTOR, "md-list.md-list-block")
+        articles_elements = driver.find_elements(
+            By.CSS_SELECTOR, "md-list.md-list-block")
 
         for article in articles_elements:
-            title_parts = article.find_elements(By.CSS_SELECTOR, "div.details-wrapper div.details div.details-top div > span > a")
-            summary_part = article.find_element(By.CSS_SELECTOR, "div.subtitles-text-wrapper.visible div.summary-text > a").text
+            title_parts = article.find_elements(
+                By.CSS_SELECTOR, "div.details-wrapper div.details div.details-top div > span > a")
+            summary_part = article.find_element(
+                By.CSS_SELECTOR, "div.subtitles-text-wrapper.visible div.summary-text > a").text
             full_title = ' '.join([part.text for part in title_parts])
-            search_count_element = article.find_element(By.CSS_SELECTOR, "div.search-count-title")
+            article_url = article.find_element(
+                # Извлечение URL
+                By.CSS_SELECTOR, "div.subtitles-text-wrapper.visible div.summary-text > a").get_attribute('href')
+            search_count_element = article.find_element(
+                By.CSS_SELECTOR, "div.search-count-title")
             search_count = parse_search_count(search_count_element.text)
             key = (full_title, summary_part)
             if key not in articles or articles[key]["search_count"] < search_count:
                 articles[key] = {
                     "title": full_title,
                     "description": summary_part,
+                    "url": article_url,  # Добавление URL
                     "country_code": loc,
                     "search_count": search_count
                 }
@@ -125,22 +136,26 @@ def fetch_articles(loc, driver):
         driver.quit()
     return articles
 
-def insert_into_db(article_title, article_description, country_name, search_count):
+
+def insert_into_db(article_title, article_description, article_url, country_name, search_count):
     try:
         if country_name == "United States":
             country_name = "USA"
 
         with sqlite3.connect(r'C:\Users\als19\Desktop\mysite\db.sqlite3') as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM news WHERE title = ? AND description = ?", (article_title, article_description))
+            cursor.execute("SELECT COUNT(*) FROM news WHERE title = ? AND description = ?",
+                           (article_title, article_description))
             exists = cursor.fetchone()[0] > 0
             if not exists:
                 current_datetime = datetime.datetime.now()
-                formatted_date = current_datetime.strftime('%Y-%m-%d %H:%M:%S') # Преобразование datetime в строку
-                cursor.execute("INSERT INTO news (title, description, country_name, searches, date) VALUES (?, ?, ?, ?, ?)",
-                               (article_title, article_description, country_name, search_count, formatted_date))
+                formatted_date = current_datetime.strftime(
+                    '%Y-%m-%d %H:%M:%S')  # Преобразование datetime в строку
+                cursor.execute("INSERT INTO news (title, description, url, country_name, searches, date) VALUES (?, ?, ?, ?, ?, ?)",
+                               (article_title, article_description, article_url, country_name, search_count, formatted_date))
     except sqlite3.Error as e:
         logger.error(f"Ошибка SQLite: {e}")
+
 
 async def main():
     with ThreadPoolExecutor(max_workers=10) as executor:
@@ -160,10 +175,12 @@ async def main():
         for article_info in unique_articles.values():
             title = article_info['title']
             description = article_info['description']
+
             country_code = article_info['country_code']
             country_name = locations[country_code]
             search_count = article_info['search_count']
-            insert_into_db(title, description, country_name, search_count)
+            insert_into_db(title, description,
+                           article_info['url'], country_name, search_count)
 
 if __name__ == "__main__":
     asyncio.run(main())
