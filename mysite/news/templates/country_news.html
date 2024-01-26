@@ -1,11 +1,16 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>World News - {{ country.name }}</title>
-    {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 </head>
 <body>
+    <div class="background-image" style="background-image: url('{% static flag_image_path %}');"></div>
+
+
+    <div class="content">
 
     {% include 'menu.html' %}
 
@@ -27,5 +32,7 @@
     <footer>
         <!-- Футер сайта -->
     </footer>
+    </div>
+    <script src="{% static 'js/backgroundPreload.js' %}"></script>
 </body>
 </html>

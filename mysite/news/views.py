@@ -15,13 +15,13 @@ def home(request):
 
 def get_top_news_by_country(country_name):
     return News.objects.filter(country_name=country_name)
+
 def country_news(request, country_name):
     country = get_object_or_404(Country, name=country_name)
-    news_list = News.objects.filter(country_name=country).order_by('-date')
-    for news in news_list:
-        print(news.title)  # Вывод заголовков новостей
-    return render(request, 'country_news.html', {'news_list': news_list, 'country': country})
-
+    # Сортировка сначала по дате (новые вначале), затем по searches (убывание)
+    news_list = News.objects.filter(country_name=country).order_by('-date', '-searches')[:20]
+    flag_image_path = f'flags/{country.name}.jpg'
+    return render(request, 'country_news.html', {'news_list': news_list, 'country': country, 'flag_image_path': flag_image_path})
 
 
 def news_detail(request, news_id):
