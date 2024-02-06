@@ -1,10 +1,3 @@
-@media (max-width: 600px) {
-    .news-container {
-        grid-template-columns: 1fr; /* Для мобильных устройств */
-    }
-}
-
-
 html, body {
     width: 100%;
     height: 100%;
@@ -134,7 +127,7 @@ nav a:hover {
 
 /* Стилизация ссылок внутри выпадающего списка */
 .dropdown-content a {
-    color: black; /* Цвет текста */
+    color: #333333;
     padding: 12px 16px; /* Отступы */
     text-decoration: none;
     display: block;
@@ -187,7 +180,7 @@ nav a:hover {
 }
 
 .news-item {
-    background-color: #f5f5f5;
+    background-color: #ffffff;
     padding: 15px;
     border-radius: 0px; /* Закругленные углы для плиток */
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* Плавный переход для эффектов наведения */
@@ -203,9 +196,8 @@ nav a:hover {
 /* Убедитесь, что ваши ссылки внутри .news-item стилизованы соответствующим образом */
 .news-item a {
     text-decoration: none;
-    color: inherit; /* Наследует цвет текста от родительского элемента */
+    color: #333333; 
 }
-
 
 body {
     margin: 0;
@@ -224,29 +216,35 @@ main {
 }
 
 .country-name {
-    font-size: 82px;
+    font-size: 72px;
     font-weight: bold;
-    color: #ffffff; /* Синий цвет Windows */
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    color: #333333; /* Цвет шрифта */
+    margin: 30px 0; /* Отступ сверху и снизу */
 }
-
-.background-image {
-    background-color: rgb(169, 169, 169);
-    transition: opacity 1s ease-in-out;
-    position: fixed; /* или absolute, в зависимости от вашего дизайна */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-    z-index: -1; /* Установите фон под содержимым */
-    filter: blur(4px) brightness(50%); /* Блюр и затемнение */
-}
-
 
 .content {
     position: relative;
     z-index: 1;
     /* Другие стили для содержимого страницы */
+}
+
+.news-detail {
+    background-color: #ffffff; /* Цвет фона блока с новостью */
+    padding: 20px; /* Поля вокруг содержимого новости */
+    border-radius: 5px; /* Закругление углов блока с новостью */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Тень для блока с новостью */
+    margin: 20px 500px; /* Внешний отступ блока с новостью, задаем отступы справа и слева */
+    white-space: pre-line;
+}
+
+.news-detail h2 {
+    color: #333333; /* Цвет заголовка новости */
+    font-size: 24px; /* Размер шрифта заголовка новости */
+    margin-bottom: 10px; /* Внешний отступ снизу от заголовка новости */
+}
+
+.news-detail p {
+    color: #666666; /* Цвет текста новости */
+    font-size: 16px; /* Размер шрифта текста новости */
+    line-height: 2; /* Межстрочный интервал текста новости */
 }
