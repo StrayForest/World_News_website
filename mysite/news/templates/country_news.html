@@ -7,9 +7,6 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <div class="background-image" style="background-image: url('{% static flag_image_path %}');"></div>
-
-
     <div class="content">
 
     {% include 'menu.html' %}
@@ -22,10 +19,13 @@
         <div class="news-container">
             {% for news in news_list %}
                 <div class="news-item">
-                    <h2>{{ news.title }}</h2>
-                    <p>{{ news.description }}</p>
-                    <!-- Другие детали -->
+                    <a href="{% url 'news_detail' country_name=country.name news_id=news.id %}">
+                        <h2>{{ news.title }}</h2>
+                        <p>{{ news.description }}</p>
+                        <!-- Другие детали -->
+                    </a>
                 </div>
+            
             {% endfor %}
         </div>        
     </main>
@@ -33,6 +33,5 @@
         <!-- Футер сайта -->
     </footer>
     </div>
-    <script src="{% static 'js/backgroundPreload.js' %}"></script>
 </body>
 </html>

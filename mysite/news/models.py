@@ -15,6 +15,7 @@ class News(models.Model):
     country_name = models.CharField(max_length=100)
     searches = models.IntegerField(default=0)
     date = models.DateTimeField(auto_now_add=True)
+    content_review = models.TextField()
 
     class Meta:
         db_table = 'news'
