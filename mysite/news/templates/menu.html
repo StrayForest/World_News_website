@@ -1,3 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Country Menu</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
 <div class="header-container">
     <header>
         <div class="menu-container">
@@ -29,7 +38,7 @@
                     <li class="{% if country.name == 'Vietnam' %}active{% endif %}"><a href="{% url 'country_news' country_name='Vietnam' %}">Vietnam</a></li>
 
                     <li class="dropdown">
-                        <a href="javascript:void(0)" class="dropbtn">Другие страны</a>
+                        <a class="dropbtn"></a>
                         <div class="dropdown-content">
                             <a href="{% url 'country_news' country_name='Austria' %}">Austria</a>
                             <a href="{% url 'country_news' country_name='Belgium' %}">Belgium</a>
@@ -71,3 +80,6 @@
         </div>
     </header>
 </div>
+
+</body>
+</html>

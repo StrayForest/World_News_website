@@ -21,14 +21,16 @@ def initialize_webdriver():
     return webdriver.Chrome(options=chrome_options)
 
 
-async def scrape_news_content(news_id, news_url, time_sleep):
+async def scrape_news_content(news_id, news_url, time_sleep, semaphore):
     max_attempts = 2  # Максимальное количество попыток сбора информации
     attempts = 0
 
     while attempts < max_attempts:
         try:
             headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                "Accept-Language": "en-US,en;q=0.9"
             }
 
             connector = TCPConnector(ssl=False)  # Отключаем проверку SSL
@@ -75,38 +77,49 @@ async def scrape_news_content(news_id, news_url, time_sleep):
 
 
 async def main():
-    global time_sleep  # Объявление, что используется глобальная переменная
+    global time_sleep
+    
+    # Инициализация семафора
+    semaphore = asyncio.Semaphore(5)
+    
     # Получение списка уникальных URL с пустым контентом
     c.execute("SELECT id, url FROM news WHERE content IS NULL OR content = ''")
     unique_news = c.fetchall()
 
-    # Запуск задач для новостей с пустым контентом сразу
-    tasks = [scrape_news_content(news_id, news_url, time_sleep) for news_id, news_url in unique_news]
-    await asyncio.gather(*tasks)
+    # Запуск задач для новостей с пустым контентом
+    tasks = []
+    for news_id, news_url in unique_news:
+        task = scrape_news_content(news_id, news_url, time_sleep, semaphore)
+        tasks.append(task)
+        if len(tasks) >= 5:
+            await asyncio.gather(*tasks)
+            tasks = []
 
     # После первой попытки
     # Добавление задержки в 3 секунды
     await asyncio.sleep(3)
 
     time_sleep = 3  # Обновление переменной
-
+    print("Запуск скрипта[return]...")
     # Повторное получение списка уникальных URL с пустым контентом
     c.execute("SELECT id, url FROM news WHERE content IS NULL OR content = ''")
     unique_news = c.fetchall()
 
     # Запуск задач для новостей с пустым контентом с задержкой
-    tasks = [scrape_news_content(news_id, news_url, time_sleep) for news_id, news_url in unique_news]
-    await asyncio.gather(*tasks)
+    for news_id, news_url in unique_news:
+        task = scrape_news_content(news_id, news_url, time_sleep, semaphore)
+        asyncio.create_task(task)
 
     # После второй попытки
     # Заполнение пустых записей в базе данных
     c.execute(
         "UPDATE news SET content = ? WHERE content IS NULL OR content = ''", ('Error: ?',))
     conn.commit()
+    print("Скрипт[return] успешно выполнен.")
 
-    print("Запуск скрипта...")
-    subprocess.run(["python", "C:\\Users\\als19\\Desktop\\mysite\\scripts\\# test.py"])
-    print("Скрипт успешно выполнен.")
+    print("Запуск скрипта[find error]...")
+    subprocess.run(["python", "C:\\Users\\als19\\Desktop\\mysite\\scripts\\import_content2.py"])
+    print("Скрипт[find error] успешно выполнен.")
 
 if __name__ == "__main__":
     conn = connect_to_database()
