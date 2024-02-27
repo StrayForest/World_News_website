@@ -27,9 +27,13 @@ def filter_content(article_content):
 
     # Удаление символов из вики [1]
     article_content = re.sub(r'\[\d+\]', '', article_content)
+    article_content = re.sub('[]', '', article_content)
+
 
     # Удаление символов "####"
     article_content = re.sub(r'####', '', article_content)
+
+    article_content = re.sub(r'**', '', article_content)
 
 
     return article_content
@@ -69,7 +73,7 @@ for article_id, original_content in articles_to_process:
 
                 # Устанавливаем флаг успешного выполнения
                 success_flag = True
-                time.sleep(5)  # Задержка 2 секунд перед следующим запросом
+                time.sleep(7)  # Задержка 5 секунд перед следующим запросом
                 break  # Выход из цикла после успешного выполнения
 
             except Exception as e:

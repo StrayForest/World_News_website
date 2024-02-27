@@ -1,18 +1,29 @@
-
 from pathlib import Path
-import os
+import sys
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Определение MIDDLEWARE
+MIDDLEWARE = [
+    # Другие middleware
+]
+
+# Добавление debug_toolbar.middleware.DebugToolbarMiddleware только если не выполняется тестирование
+if 'test' not in sys.argv:
+    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+
+# Настройка для отображения панели отладки только в режиме DEBUG
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda request: request.debug,
+}
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "static",
-    '/path/to/mysite/static/',
 ]
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -57,7 +68,7 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'news' / 'templates'], # Путь к каталогу с шаблонами
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -78,11 +89,14 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',  # Используем движок PostgreSQL
+        'NAME': 'postgres',  # Имя вашей базы данных PostgreSQL
+        'USER': 'lisarules',
+        'PASSWORD': 'fktrctq1',
+        'HOST': 'dbnews.cnaiuacyy8fi.eu-central-1.rds.amazonaws.com',  # Укажите хост базы данных
+        'PORT': 5432,  # По умолчанию порт PostgreSQL
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -118,7 +132,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

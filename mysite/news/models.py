@@ -19,8 +19,12 @@ class News(models.Model):
 
     class Meta:
         db_table = 'news'
-            
+        indexes = [
+            models.Index(fields=['country_name']),
+            models.Index(fields=['searches']),
+            models.Index(fields=['date']),
+            # Другие индексы по необходимости
+        ]
+
     def __str__(self):
         return self.title
-
-
