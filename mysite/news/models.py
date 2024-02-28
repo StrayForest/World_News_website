@@ -4,10 +4,12 @@ class Country(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
+        managed = False  # Это отключит управление созданием таблицы Django
         db_table = 'news_country'
 
     def __str__(self):
         return self.name
+
 
 class News(models.Model):
     title = models.CharField(max_length=200)
